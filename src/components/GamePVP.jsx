@@ -63,20 +63,22 @@ function GamePVP({ roomCode, onLeave }) {
 
   return (
     <div className="flex flex-col items-center gap-6">
-      {/* Room Code Header */}
-      <div className="bg-gray-800 rounded-xl px-6 py-3 border border-purple-500/30">
-        <p className="text-sm text-gray-400 mb-1">Room Code</p>
-        <div className="flex items-center gap-3">
-          <p className="text-2xl font-mono font-bold text-purple-400 tracking-wider">{roomCode}</p>
-          <button
-            onClick={() => navigator.clipboard.writeText(roomCode)}
-            className="text-xs text-gray-500 hover:text-gray-300"
-            title="Copy code"
-          >
-            📋
-          </button>
+      {/* Room Code Header - only show if roomCode is provided */}
+      {roomCode && (
+        <div className="bg-gray-800 rounded-xl px-6 py-3 border border-purple-500/30">
+          <p className="text-sm text-gray-400 mb-1">Room Code</p>
+          <div className="flex items-center gap-3">
+            <p className="text-2xl font-mono font-bold text-purple-400 tracking-wider">{roomCode}</p>
+            <button
+              onClick={() => navigator.clipboard.writeText(roomCode)}
+              className="text-xs text-gray-500 hover:text-gray-300"
+              title="Copy code"
+            >
+              📋
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Scoreboard */}
       <div className="flex gap-4 sm:gap-8">
@@ -123,7 +125,7 @@ function GamePVP({ roomCode, onLeave }) {
           onClick={onLeave}
           className="px-6 py-3 bg-gray-800 text-gray-300 font-semibold rounded-xl hover:bg-gray-700 transition-colors border border-gray-700"
         >
-          Leave Room
+          {roomCode ? 'Leave Room' : 'Back to Menu'}
         </button>
       </div>
     </div>

@@ -12,19 +12,16 @@ function App() {
   const [pvpType, setPvpType] = useState('local')
   const [isHost, setIsHost] = useState(false)
 
-  const handleCreateRoom = (online = false) => {
-    setPvpType(online ? 'online' : 'local')
-    // Online rooms must be created on the socket server (server generates the code).
-    // Local rooms can still use a locally generated code.
-    const newCode = online ? 'CREATING…' : Math.random().toString(36).substring(2, 6).toUpperCase()
-    setRoomCode(newCode)
+  const handleCreateRoom = () => {
+    setPvpType('online')
+    setRoomCode('CREATING…')
     setIsHost(true)
     setGameMode('pvp')
   }
 
-  const handleJoinRoom = (online = false) => {
+  const handleJoinRoom = () => {
     if (joinCode.trim().length >= 4) {
-      setPvpType(online ? 'online' : 'local')
+      setPvpType('online')
       setRoomCode(joinCode.trim().toUpperCase())
       setIsHost(false)
       setGameMode('pvp')
@@ -54,17 +51,15 @@ function App() {
 
         {/* Game Card */}
         <div className="bg-gray-900 rounded-3xl p-6 shadow-xl border border-gray-800">
-          {gameMode === 'pvp' && roomCode ? (
-            pvpType === 'online'
-              ? (
-                  <GamePVPOnline
-                    roomCode={roomCode}
-                    isHost={isHost}
-                    onRoomCode={(code) => setRoomCode(code)}
-                    onLeave={handleLeaveRoom}
-                  />
-                )
-              : <GamePVP roomCode={roomCode} onLeave={handleLeaveRoom} />
+          {gameMode === 'pvp' && pvpType === 'online' && roomCode ? (
+            <GamePVPOnline
+              roomCode={roomCode}
+              isHost={isHost}
+              onRoomCode={(code) => setRoomCode(code)}
+              onLeave={handleLeaveRoom}
+            />
+          ) : gameMode === 'pvp' && pvpType === 'local' ? (
+            <GamePVP onLeave={handleLeaveRoom} />
           ) : (
             <GameVsAI difficulty={difficulty} playerSymbol={playerSymbol} />
           )}
@@ -144,7 +139,7 @@ function App() {
                   {/* Mode Toggle */}
                   <div className="flex gap-2 justify-center mb-4">
                     <button
-                      onClick={() => setPvpType('local')}
+                      onClick={() => { setPvpType('local'); setGameMode('pvp'); }}
                       className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                         pvpType === 'local'
                           ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
@@ -168,7 +163,7 @@ function App() {
                   {pvpType === 'online' ? (
                     <>
                       <button
-                        onClick={() => handleCreateRoom(true)}
+                        onClick={handleCreateRoom}
                         className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-xl hover:opacity-90 transition-opacity shadow-lg shadow-purple-500/25 block w-full"
                       >
                         Create Online Room
@@ -180,46 +175,19 @@ function App() {
                           placeholder="Enter room code"
                           value={joinCode}
                           onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-                          onKeyPress={(e) => e.key === 'Enter' && handleJoinRoom(true)}
+                          onKeyPress={(e) => e.key === 'Enter' && handleJoinRoom()}
                           className="w-full px-4 py-3 bg-gray-800 text-gray-300 rounded-xl border border-gray-700 focus:outline-none focus:border-purple-500 text-center font-mono uppercase tracking-wider"
                           maxLength={8}
                         />
                         <button
-                          onClick={() => handleJoinRoom(true)}
+                          onClick={handleJoinRoom}
                           className="mt-3 px-8 py-3 bg-gray-800 text-gray-300 font-semibold rounded-xl hover:bg-gray-700 transition-colors border border-gray-700 block w-full"
                         >
                           Join Online Room
                         </button>
                       </div>
                     </>
-                  ) : (
-                    <>
-                      <button
-                        onClick={() => handleCreateRoom(false)}
-                        className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-xl hover:opacity-90 transition-opacity shadow-lg shadow-purple-500/25 block w-full"
-                      >
-                        Create Local Room
-                      </button>
-                      <div className="text-gray-500">or</div>
-                      <div>
-                        <input
-                          type="text"
-                          placeholder="Enter room code"
-                          value={joinCode}
-                          onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-                          onKeyPress={(e) => e.key === 'Enter' && handleJoinRoom(false)}
-                          className="w-full px-4 py-3 bg-gray-800 text-gray-300 rounded-xl border border-gray-700 focus:outline-none focus:border-purple-500 text-center font-mono uppercase tracking-wider"
-                          maxLength={8}
-                        />
-                        <button
-                          onClick={() => handleJoinRoom(false)}
-                          className="mt-3 px-8 py-3 bg-gray-800 text-gray-300 font-semibold rounded-xl hover:bg-gray-700 transition-colors border border-gray-700 block w-full"
-                        >
-                          Join Local Room
-                        </button>
-                      </div>
-                    </>
-                  )}
+                  ) : null}
                 </div>
               )}
             </div>
